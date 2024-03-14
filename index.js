@@ -1,5 +1,5 @@
-const { resolve } = require('path');
-const { readdir, writeFile } = require('fs').promises;
+const { resolve } = require("path");
+const { readdir, writeFile } = require("fs").promises;
 
 async function* getFiles(dir) {
   const dirents = await readdir(dir, { withFileTypes: true });
@@ -8,7 +8,7 @@ async function* getFiles(dir) {
 
     if (
       dirent.isDirectory() &&
-      (res.indexOf('photo') > -1 || res.indexOf('main') > -1)
+      (res.indexOf("photo") > -1 || res.indexOf("main") > -1)
     ) {
       yield* getFiles(res);
     } else {
@@ -19,16 +19,18 @@ async function* getFiles(dir) {
 
 (async () => {
   const manifest = { main: [], photo: [] };
-  for await (const f of getFiles('.')) {
+  for await (const f of getFiles(".")) {
+    if (f.indexOf("DS_Store") > -1) continue;
+
     // https://raw.githubusercontent.com/rina-andria/rwt/master/main
     const path = f.replace(
       __dirname,
-      'https://raw.githubusercontent.com/rina-andria/rwt/master'
+      "https://raw.githubusercontent.com/rina-andria/rwt/master",
     );
-    if (path.indexOf('/main/') > -1) {
+    if (path.indexOf("/main/") > -1) {
       manifest.main.push(path);
     }
-    if (path.indexOf('/photo/') > -1) {
+    if (path.indexOf("/photo/") > -1) {
       manifest.photo.push(path);
     }
   }
@@ -36,16 +38,16 @@ async function* getFiles(dir) {
   console.log(manifest);
 
   await writeFile(
-    'manifest.json',
+    "manifest.json",
     JSON.stringify(manifest),
-    'utf8',
+    "utf8",
     function (err) {
       if (err) {
-        console.log('An error occured while writing JSON Object to File.');
+        console.log("An error occured while writing JSON Object to File.");
         return console.log(err);
       }
 
-      console.log('JSON file has been saved.');
-    }
+      console.log("JSON file has been saved.");
+    },
   );
 })();
